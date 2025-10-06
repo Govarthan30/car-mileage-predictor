@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 import pickle
 
 # Set random seed for reproducibility
@@ -20,33 +21,26 @@ original_data = pd.DataFrame({
 
 # Generate 100 additional synthetic rows
 n = 100
-
-# Randomly choose fuel type
 fuel_choices = ["petrol", "diesel"]
 fuel = np.random.choice(fuel_choices, size=n)
 
-# Generate engine size based on fuel type (diesel tends to be larger)
 engine = np.where(
     fuel == "diesel",
-    np.random.randint(1400, 2601, size=n),  # Diesel: 1400-2600 cc
-    np.random.randint(800, 2001, size=n)    # Petrol: 800-2000 cc
+    np.random.randint(1400, 2601, size=n),
+    np.random.randint(800, 2001, size=n)
 )
 
-# Generate weight correlated with engine size
 weight = (800 + 0.4 * engine + np.random.normal(0, 100, size=n)).astype(int)
-weight = np.clip(weight, 900, 2000)  # Reasonable bounds
+weight = np.clip(weight, 900, 2000)
 
-# Generate horsepower correlated with engine and fuel
 hp_base = engine * 0.07
 hp_adjust = np.where(fuel == "diesel", -5, 0)
 horsepower = (hp_base + hp_adjust + np.random.normal(0, 8, size=n)).astype(int)
 horsepower = np.clip(horsepower, 60, 200)
 
-# Generate speed correlated with horsepower
 speed = (40 + 0.45 * horsepower + np.random.normal(0, 5, size=n)).astype(int)
 speed = np.clip(speed, 50, 180)
 
-# Generate mileage with realistic dependencies
 mileage = np.where(
     fuel == "diesel",
     18.0 + (2000 - engine) * 0.002 + (1600 - weight) * 0.003 + np.random.normal(0, 1.0, size=n),
@@ -54,7 +48,6 @@ mileage = np.where(
 )
 mileage = np.clip(mileage, 8.0, 28.0)
 
-# Create synthetic DataFrame
 synthetic_data = pd.DataFrame({
     "engine": engine,
     "weight": weight,
@@ -64,12 +57,11 @@ synthetic_data = pd.DataFrame({
     "mileage": mileage
 })
 
-# Combine original and synthetic data
 data = pd.concat([original_data, synthetic_data], ignore_index=True)
 
 # Encode fuel type
 le = LabelEncoder()
-data["fuel"] = le.fit_transform(data["fuel"])  # petrol=1, diesel=0 for example
+data["fuel"] = le.fit_transform(data["fuel"])
 
 # Features & Target
 X = data[["engine", "weight", "horsepower", "fuel", "speed"]]
@@ -82,10 +74,33 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-# Save model as pickle
+# Predictions
+y_pred = model.predict(X_test)
+
+# Print actual vs predicted values (first 10 for readability)
+print("\n--- Test Data Predictions ---")
+for actual, pred in zip(y_test[:10], y_pred[:10]):
+    print(f"Actual: {actual:.2f} | Predicted: {pred:.2f}")
+
+# Accuracy metrics
+r2 = r2_score(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred)
+rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+# Percentage Accuracy (two ways)
+accuracy_from_r2 = r2 * 100
+accuracy_from_mae = (1 - (mae / np.mean(y_test))) * 100
+
+print("\n--- Model Performance ---")
+print(f"R² Score: {r2:.4f}")
+print(f"Mean Absolute Error (MAE): {mae:.4f}")
+print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
+print(f"Accuracy (from R²): {accuracy_from_r2:.2f}%")
+print(f"Accuracy (from MAE): {accuracy_from_mae:.2f}%")
+
+# Save model
 with open("car_mileage_model.pkl", "wb") as f:
     pickle.dump(model, f)
 
-# Save label encoder too
 with open("fuel_encoder.pkl", "wb") as f:
     pickle.dump(le, f)

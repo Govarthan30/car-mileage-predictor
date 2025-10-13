@@ -87,16 +87,14 @@ r2 = r2_score(y_test, y_pred)
 mae = mean_absolute_error(y_test, y_pred)
 rmse = mean_squared_error(y_test, y_pred, squared=False)
 
-# Percentage Accuracy (two ways)
-accuracy_from_r2 = r2 * 100
+# Percentage Accuracy from MAE
 accuracy_from_mae = (1 - (mae / np.mean(y_test))) * 100
 
 print("\n--- Model Performance ---")
 print(f"R² Score: {r2:.4f}")
 print(f"Mean Absolute Error (MAE): {mae:.4f}")
 print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
-print(f"Accuracy (from R²): {accuracy_from_r2:.2f}%")
-print(f"Accuracy (from MAE): {accuracy_from_mae:.2f}%")
+print(f"Accuracy: {accuracy_from_mae:.2f}%")
 
 # Save model
 with open("car_mileage_model.pkl", "wb") as f:

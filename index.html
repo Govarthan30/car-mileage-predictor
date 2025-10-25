@@ -1,267 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Mileage Predictor</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 500px;
-            padding: 30px;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #2c3e50;
-            font-size: 28px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #34495e;
-        }
-        input, select {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        input:focus, select:focus {
-            border-color: #3498db;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-        }
-        button {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-        #predictBtn {
-            background: linear-gradient(to right, #3498db, #2c3e50);
-            color: white;
-        }
-        #randomBtn {
-            background: #f1f2f6;
-            color: #2c3e50;
-            border: 2px solid #bdc3c7;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            opacity: 0.95;
-        }
-        button:active {
-            transform: translateY(0);
-        }
-        .result {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-        }
-        .result.show {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .result-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #27ae60;
-            margin: 10px 0;
-        }
-        .error {
-            color: #e74c3c;
-            text-align: center;
-            margin-top: 15px;
-            display: none;
-        }
-        .error.show {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Mileage Predictor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .container { background: white; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.3); width: 100%; max-width: 500px; padding: 30px; }
+    h1 { text-align: center; margin-bottom: 25px; color: #2c3e50; font-size: 28px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #34495e; }
+    input, select { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; transition: border-color 0.3s; }
+    input:focus, select:focus { border-color: #3498db; outline: none; box-shadow: 0 0 0 3px rgba(52,152,219,0.2); }
+    .button-group { display: flex; gap: 12px; margin-top: 10px; }
+    button { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s, opacity 0.2s; }
+    #predictBtn { background: linear-gradient(to right, #3498db, #2c3e50); color: white; }
+    #randomBtn { background: #f1f2f6; color: #2c3e50; border: 2px solid #bdc3c7; }
+    button:hover { transform: translateY(-2px); opacity: 0.95; }
+    .result { margin-top: 25px; padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center; display: none; }
+    .result.show { display: block; animation: fadeIn 0.5s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .result-value { font-size: 32px; font-weight: 700; color: #27ae60; margin: 10px 0; }
+    .error { color: #e74c3c; text-align: center; margin-top: 15px; display: none; }
+    .error.show { display: block; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚗 Car Mileage Predictor</h1>
-        <form id="predictionForm">
-            <div class="form-group">
-                <label for="engine">Engine Capacity (cc)</label>
-                <input type="number" id="engine" min="800" max="2600" value="1500" required>
-            </div>
-            <div class="form-group">
-                <label for="weight">Weight (kg)</label>
-                <input type="number" id="weight" min="900" max="2000" value="1300" required>
-            </div>
-            <div class="form-group">
-                <label for="horsepower">Horsepower (HP)</label>
-                <input type="number" id="horsepower" min="60" max="200" value="100" required>
-            </div>
-            <div class="form-group">
-                <label for="fuel">Fuel Type</label>
-                <select id="fuel" required>
-                    <option value="petrol">Petrol</option>
-                    <option value="diesel">Diesel</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="speed">Top Speed (km/h)</label>
-                <input type="number" id="speed" min="50" max="180" value="100" required>
-            </div>
-            
-            <div class="button-group">
-                <button type="button" id="randomBtn">Load Random Data</button>
-                <button type="submit" id="predictBtn">Predict Mileage</button>
-            </div>
-        </form>
-        
-        <div id="error" class="error"></div>
-        
-        <div id="result" class="result">
-            <h2>Predicted Mileage</h2>
-            <div class="result-value" id="mileageValue">--</div>
-            <p>km per liter</p>
-        </div>
+  <div class="container">
+    <h1>🚗 Car Mileage Predictor</h1>
+    <form id="predictionForm">
+      <div class="form-group">
+        <label for="engine">Engine Size (Liters)</label>
+        <input type="number" id="engine" min="1.0" max="5.0" step="0.1" value="2.0" required />
+      </div>
+      <div class="form-group">
+        <label for="weight">Car Weight (kg)</label>
+        <input type="number" id="weight" min="900" max="3000" value="1500" required />
+      </div>
+      <div class="form-group">
+        <label for="horsepower">Horsepower (HP)</label>
+        <input type="number" id="horsepower" min="80" max="350" value="120" required />
+      </div>
+      <div class="form-group">
+        <label for="fuel">Fuel Type</label>
+        <select id="fuel" required>
+          <option value="Petrol">Petrol</option>
+          <option value="Diesel">Diesel</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="speed">Top Speed (km/h)</label>
+        <input type="number" id="speed" min="60" max="220" value="120" required />
+      </div>
+
+      <div class="button-group">
+        <button type="button" id="randomBtn">Load Random Data</button>
+        <button type="submit" id="predictBtn">Predict Mileage</button>
+      </div>
+    </form>
+
+    <div id="error" class="error"></div>
+
+    <div id="result" class="result">
+      <h2>Predicted Mileage</h2>
+      <div class="result-value" id="mileageValue">--</div>
+      <p>km per liter</p>
     </div>
+  </div>
 
-    <script>
-        // Generate realistic random car data based on your dataset distribution
-        function generateRandomCarData() {
-            // Fuel type (50% chance for each)
-            const fuel = Math.random() > 0.5 ? 'petrol' : 'diesel';
-            
-            // Engine size based on fuel type
-            let engine;
-            if (fuel === 'diesel') {
-                engine = Math.floor(Math.random() * (2600 - 1400 + 1)) + 1400;
-            } else {
-                engine = Math.floor(Math.random() * (2000 - 800 + 1)) + 800;
-            }
-            
-            // Weight correlated with engine
-            const weightBase = 800 + 0.4 * engine;
-            const weightNoise = (Math.random() - 0.5) * 200;
-            let weight = Math.round(weightBase + weightNoise);
-            weight = Math.max(900, Math.min(2000, weight));
-            
-            // Horsepower correlated with engine
-            const hpBase = engine * 0.07;
-            const hpAdjust = fuel === 'diesel' ? -5 : 0;
-            const hpNoise = (Math.random() - 0.5) * 16;
-            let horsepower = Math.round(hpBase + hpAdjust + hpNoise);
-            horsepower = Math.max(60, Math.min(200, horsepower));
-            
-            // Speed correlated with horsepower
-            const speedBase = 40 + 0.45 * horsepower;
-            const speedNoise = (Math.random() - 0.5) * 10;
-            let speed = Math.round(speedBase + speedNoise);
-            speed = Math.max(50, Math.min(180, speed));
-            
-            return { engine, weight, horsepower, fuel, speed };
-        }
+  <script>
+    // Generate random realistic data
+    function generateRandomCarData() {
+      const fuel = Math.random() > 0.5 ? "Petrol" : "Diesel";
+      const engine = +(Math.random() * (5.0 - 1.0) + 1.0).toFixed(2);
+      const weight = Math.round(900 + Math.random() * 2000);
+      const horsepower = Math.round(80 + Math.random() * 270);
+      const speed = Math.round(60 + Math.random() * 160);
+      return { engine, weight, horsepower, fuel, speed };
+    }
 
-        // Load random data into form
-        document.getElementById('randomBtn').addEventListener('click', () => {
-            const randomData = generateRandomCarData();
-            document.getElementById('engine').value = randomData.engine;
-            document.getElementById('weight').value = randomData.weight;
-            document.getElementById('horsepower').value = randomData.horsepower;
-            document.getElementById('fuel').value = randomData.fuel;
-            document.getElementById('speed').value = randomData.speed;
-            
-            // Hide previous results/errors
-            document.getElementById('result').classList.remove('show');
-            document.getElementById('error').classList.remove('show');
+    document.getElementById("randomBtn").addEventListener("click", () => {
+      const data = generateRandomCarData();
+      document.getElementById("engine").value = data.engine;
+      document.getElementById("weight").value = data.weight;
+      document.getElementById("horsepower").value = data.horsepower;
+      document.getElementById("fuel").value = data.fuel;
+      document.getElementById("speed").value = data.speed;
+      document.getElementById("result").classList.remove("show");
+      document.getElementById("error").classList.remove("show");
+    });
+
+    document.getElementById("predictionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errorDiv = document.getElementById("error");
+      const resultDiv = document.getElementById("result");
+      errorDiv.classList.remove("show");
+      resultDiv.classList.remove("show");
+
+      // Prepare data keys exactly as model expects
+      const formData = {
+        Engine_Size_Liters: parseFloat(document.getElementById("engine").value),
+        Car_Weight_kg: parseFloat(document.getElementById("weight").value),
+        Horsepower: parseFloat(document.getElementById("horsepower").value),
+        Fuel: document.getElementById("fuel").value,
+        Speed: parseFloat(document.getElementById("speed").value)
+      };
+
+      try {
+        const response = await fetch("http://localhost:5000/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
         });
 
-        // Handle form submission
-        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const errorDiv = document.getElementById('error');
-            const resultDiv = document.getElementById('result');
-            
-            // Reset UI
-            errorDiv.classList.remove('show');
-            resultDiv.classList.remove('show');
-            
-            // Get form values
-            const formData = {
-                engine: parseInt(document.getElementById('engine').value),
-                weight: parseInt(document.getElementById('weight').value),
-                horsepower: parseInt(document.getElementById('horsepower').value),
-                fuel: document.getElementById('fuel').value,
-                speed: parseInt(document.getElementById('speed').value)
-            };
-            
-            try {
-                // Validate inputs
-                if (isNaN(formData.engine) || isNaN(formData.weight) || 
-                    isNaN(formData.horsepower) || isNaN(formData.speed)) {
-                    throw new Error('Please enter valid numbers for all fields');
-                }
-                
-                // Send prediction request
-                const response = await fetch('http://localhost:5000/predict', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Prediction failed');
-                }
-                
-                const result = await response.json();
-                document.getElementById('mileageValue').textContent = result['Predicted Mileage (km/l)'];
-                resultDiv.classList.add('show');
-                
-            } catch (error) {
-                console.error('Prediction error:', error);
-                errorDiv.textContent = error.message || 'Failed to get prediction. Check console for details.';
-                errorDiv.classList.add('show');
-            }
-        });
-    </script>
+        if (!response.ok) throw new Error("Server error. Try again later.");
+        const result = await response.json();
+
+        if (result.error) throw new Error(result.error);
+
+        // If backend returns MPG, convert to km/l: 1 MPG ≈ 0.425 km/l
+        const mileageKM = ("Predicted MPG" in result) 
+                          ? (parseFloat(result["Predicted MPG"]) * 0.425).toFixed(2)
+                          : parseFloat(result["Predicted Mileage (km/l)"]).toFixed(2);
+
+        document.getElementById("mileageValue").textContent = mileageKM;
+        resultDiv.classList.add("show");
+      } catch (err) {
+        errorDiv.textContent = err.message || "Prediction failed.";
+        errorDiv.classList.add("show");
+      }
+    });
+  </script>
 </body>
 </html>

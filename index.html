@@ -32,15 +32,15 @@
     <form id="predictionForm">
       <div class="form-group">
         <label for="engine">Engine Size (Liters)</label>
-        <input type="number" id="engine" min="1.0" max="5.0" step="0.1" value="2.0" required />
+        <input type="number" id="engine" min="1.00" max="5.00" step="0.01" value="2.49" required />
       </div>
       <div class="form-group">
         <label for="weight">Car Weight (kg)</label>
-        <input type="number" id="weight" min="900" max="3000" value="1500" required />
+        <input type="number" id="weight" min="900" max="3000" value="1370" required />
       </div>
       <div class="form-group">
         <label for="horsepower">Horsepower (HP)</label>
-        <input type="number" id="horsepower" min="80" max="350" value="120" required />
+        <input type="number" id="horsepower" min="80" max="350" value="150" required />
       </div>
       <div class="form-group">
         <label for="fuel">Fuel Type</label>
@@ -48,10 +48,6 @@
           <option value="Petrol">Petrol</option>
           <option value="Diesel">Diesel</option>
         </select>
-      </div>
-      <div class="form-group">
-        <label for="speed">Top Speed (km/h)</label>
-        <input type="number" id="speed" min="60" max="220" value="120" required />
       </div>
 
       <div class="button-group">
@@ -65,7 +61,7 @@
     <div id="result" class="result">
       <h2>Predicted Mileage</h2>
       <div class="result-value" id="mileageValue">--</div>
-      <p>km per liter</p>
+      <p>Miles per liter</p>
     </div>
   </div>
 
@@ -76,7 +72,6 @@
       const engine = +(Math.random() * (5.0 - 1.0) + 1.0).toFixed(2);
       const weight = Math.round(900 + Math.random() * 2000);
       const horsepower = Math.round(80 + Math.random() * 270);
-      const speed = Math.round(60 + Math.random() * 160);
       return { engine, weight, horsepower, fuel, speed };
     }
 
@@ -86,7 +81,6 @@
       document.getElementById("weight").value = data.weight;
       document.getElementById("horsepower").value = data.horsepower;
       document.getElementById("fuel").value = data.fuel;
-      document.getElementById("speed").value = data.speed;
       document.getElementById("result").classList.remove("show");
       document.getElementById("error").classList.remove("show");
     });
@@ -103,8 +97,7 @@
         Engine_Size_Liters: parseFloat(document.getElementById("engine").value),
         Car_Weight_kg: parseFloat(document.getElementById("weight").value),
         Horsepower: parseFloat(document.getElementById("horsepower").value),
-        Fuel: document.getElementById("fuel").value,
-        Speed: parseFloat(document.getElementById("speed").value)
+        Fuel: document.getElementById("fuel").value
       };
 
       try {
@@ -121,7 +114,7 @@
 
         // If backend returns MPG, convert to km/l: 1 MPG ≈ 0.425 km/l
         const mileageKM = ("Predicted MPG" in result) 
-                          ? (parseFloat(result["Predicted MPG"]) * 0.425).toFixed(2)
+                          ? (parseFloat(result["Predicted MPG"])).toFixed(2)
                           : parseFloat(result["Predicted Mileage (km/l)"]).toFixed(2);
 
         document.getElementById("mileageValue").textContent = mileageKM;
